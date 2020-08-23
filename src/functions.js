@@ -16,8 +16,8 @@ const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle,
       }
     ))
     database.ref('devices/' + imei + '/places')
-      .push(place)
-      .set();
+      .push()
+      .set(place);
   }
 };
 
