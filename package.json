@@ -9,7 +9,7 @@
     "server": "nodemon dist/server.js"
   },
   "author": "Ugis Voicsh",
-  "url": "https://github.com/voicixs",
+  "url": "https://github.com/voicixs/teltonika-parser",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-dotenv": "^0.1.1",
@@ -17,6 +17,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "crc": "^3.8.0",
+    "firebase": "^7.19.0",
     "nodemon": "^2.0.4"
   }
 }

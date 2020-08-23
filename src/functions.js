@@ -1,6 +1,21 @@
-//https://github.com/sirfragles/Teltonika_GPS_Server_Node.js
-
 import crc from 'crc';
+import { database } from './database'
+
+const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed) {
+  console.log("saveGPS", { timestamp, latitude, longitude, altitude, angle, sattelites, speed })
+  if (imei)
+    database.ref('devices/' + imei + '/places')
+      .push()
+      .set({
+        timestamp: timestamp || undefined,
+        latitude: latitude || undefined,
+        longitude: longitude || undefined,
+        altitude: altitude || undefined,
+        angle: angle || undefined,
+        sattelites: sattelites || undefined,
+        speed: speed || undefined,
+      });
+};
 
 const isValidIMEI = function (IMEI, socket) {
   let imei_answer = new Buffer(1);
@@ -13,11 +28,9 @@ const isValidIMEI = function (IMEI, socket) {
   // socket.end(imei_answer);
 };
 
-const saveGPS = function (timestamp, latitude, longitude, altitude, angle, sattelites, speed) {
-  console.log("saveGPS", { timestamp, latitude, longitude, altitude, angle, sattelites, speed })
-};
-
 const lietenAndParseTeltonika = (socket) => {
+  //https://github.com/sirfragles/Teltonika_GPS_Server_Node.js
+  saveGPS();
   console.log('New connection.' + socket.remoteAddress);
   socket.imei = undefined;
 
@@ -40,9 +53,9 @@ const lietenAndParseTeltonika = (socket) => {
       if (data[0] === 0 && data[1] == 15) {
         if (data.length == 17)
           isValidIMEI(data.toString().substr(2, 15), socket);
-        else 
+        else
           socket.end();
-      } else 
+      } else
         socket.end();
 
     } else {
@@ -71,7 +84,7 @@ const lietenAndParseTeltonika = (socket) => {
                     var angle = parseInt(data.slice(19, 21).toString('hex'), 16);
                     var sattelites = parseInt(data.slice(21, 22).toString('hex'), 16);
                     var speed = parseInt(data.slice(22, 24).toString('hex'), 16);
-                    saveGPS(timestamp, latitude, longitude, altitude, angle, sattelites, speed);
+                    saveGPS(socket.imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed);
 
                     data = data.slice(24);
 
@@ -105,21 +118,21 @@ const lietenAndParseTeltonika = (socket) => {
                 acknowledges[3] = 0;
                 socket.end(acknowledges);
               }
-            } else 
+            } else
               socket.end();
           }
           //console.timeEnd("Dane AVL");
-        } else 
+        } else
           socket.end();
-      } 
+      }
     }
   };
 
-  const socketOnClose = (error)  => {
+  const socketOnClose = (error) => {
     console.log("Connection closed" + ":" + socket.imei + " - " + error);
   };
 
-  const socketOnError = (error)  => {
+  const socketOnError = (error) => {
     console.log("Error socket IMEI" + ":" + socket.imei + " - " + error);
   };
 
