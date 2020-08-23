@@ -3,18 +3,22 @@ import { database } from './database'
 
 const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed) {
   console.log("saveGPS", { timestamp, latitude, longitude, altitude, angle, sattelites, speed })
-  if (imei)
+  if (imei) {
+    const place = JSON.parse(JSON.stringify(
+      {
+        timestamp: timestamp || null,
+        latitude: latitude || null,
+        longitude: longitude || null,
+        altitude: altitude || null,
+        angle: angle || null,
+        sattelites: sattelites || null,
+        speed: speed || null,
+      }
+    ))
     database.ref('devices/' + imei + '/places')
-      .push()
-      .set({
-        timestamp: timestamp || "NaN",
-        latitude: latitude || "NaN",
-        longitude: longitude || "NaN",
-        altitude: altitude || "NaN",
-        angle: angle || "NaN",
-        sattelites: sattelites || "NaN",
-        speed: speed || "NaN",
-      });
+      .push(place)
+      .set();
+  }
 };
 
 const isValidIMEI = function (IMEI, socket) {
