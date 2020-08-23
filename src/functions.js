@@ -7,13 +7,13 @@ const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle,
     database.ref('devices/' + imei + '/places')
       .push()
       .set({
-        timestamp: timestamp || undefined,
-        latitude: latitude || undefined,
-        longitude: longitude || undefined,
-        altitude: altitude || undefined,
-        angle: angle || undefined,
-        sattelites: sattelites || undefined,
-        speed: speed || undefined,
+        timestamp: timestamp || "NaN",
+        latitude: latitude || "NaN",
+        longitude: longitude || "NaN",
+        altitude: altitude || "NaN",
+        angle: angle || "NaN",
+        sattelites: sattelites || "NaN",
+        speed: speed || "NaN",
       });
 };
 
