@@ -16,12 +16,13 @@ const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle,
       }
     ))
     const device = database.ref('devices/' + imei);
+    const places = device.child('places')
     
     device.set({
       ip: deviceIp
     });
 
-    device.child('places')
+    places
       .push()
       .set(place);
   }
