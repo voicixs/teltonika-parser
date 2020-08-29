@@ -1,7 +1,7 @@
 import crc from 'crc';
 import { database } from './database'
 
-const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed) {
+const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed, deviceIp) {
   console.log("saveGPS", { timestamp, latitude, longitude, altitude, angle, sattelites, speed })
   if (imei) {
     const place = JSON.parse(JSON.stringify(
@@ -15,7 +15,13 @@ const saveGPS = function (imei, timestamp, latitude, longitude, altitude, angle,
         speed: speed || null,
       }
     ))
-    database.ref('devices/' + imei + '/places')
+    const device = database.ref('devices/' + imei);
+    
+    device.set({
+      ip: deviceIp
+    });
+
+    device.child('places')
       .push()
       .set(place);
   }
@@ -34,8 +40,13 @@ const isValidIMEI = function (IMEI, socket) {
 
 const lietenAndParseTeltonika = (socket) => {
   //https://github.com/sirfragles/Teltonika_GPS_Server_Node.js
-  saveGPS();
   console.log('New connection.' + socket.remoteAddress);
+
+  var deviceIp = socket.remoteAddress;
+  if (deviceIp.substr(0, 7) == "::ffff:") {
+    deviceIp = deviceIp.substr(7)
+  }
+
   socket.imei = undefined;
 
   var socketOnData = function (data) {
@@ -88,7 +99,7 @@ const lietenAndParseTeltonika = (socket) => {
                     var angle = parseInt(data.slice(19, 21).toString('hex'), 16);
                     var sattelites = parseInt(data.slice(21, 22).toString('hex'), 16);
                     var speed = parseInt(data.slice(22, 24).toString('hex'), 16);
-                    saveGPS(socket.imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed);
+                    saveGPS(socket.imei, timestamp, latitude, longitude, altitude, angle, sattelites, speed, deviceIp);
 
                     data = data.slice(24);
 
